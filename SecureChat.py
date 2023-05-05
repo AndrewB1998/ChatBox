@@ -1,7 +1,9 @@
 from tkinter import *
+from tkinter import simpledialog
 import socket
 import threading
-from tkinter import simpledialog
+
+
 
 
 HOST = '127.0.0.1'
@@ -17,16 +19,16 @@ class Client:
         msg.withdraw()
         
         self.name = simpledialog.askstring("Name", "What is your name?", parent= msg)
-        ui_thread = threading.Thread(target=self.UI)
+        
+        ui_thread = threading.Thread(target=self.mainUI)
         receive_thread = threading.Thread(target=self.receive)
         
         self.ui_done = False
         self.running = True
-        
         ui_thread.start()
         receive_thread.start()
         
-    def UI(self):
+    def mainUI(self):
         
         self.master = Tk()
         self.master.title("Chatter")
@@ -39,22 +41,17 @@ class Client:
         # Messages
         self.messages = []
            
+        
+        # Scrollbar
+        self.y_bar = Scrollbar(self.master, orient=VERTICAL)
+        
         # Canvas to display chat and scrollbar
-        self.canvas = Canvas(self.master, bg="white", width=400, height=400)
-        self.canvas.grid(row=1, columns=5, padx=5, pady=5, sticky="NSEW")
-        self.canvas.grid_columnconfigure(0, weight=1)
-        self.canvas.grid_rowconfigure(0, weight=1)
-        
-       # Scrollbars
-        self.y_bar = Scrollbar(self.master, orient=VERTICAL, command=self.canvas.yview)
+        self.msg_list = Listbox(self.master, width=15, height=15, yscrollcommand=self.y_bar.set)
+        self.msg_list.grid(row=1, columns=5, padx=5, pady=5, sticky="NSEW")
         self.y_bar.grid(row=1, column=5, sticky="ns")
-        
-        # Canvas configuration
-        self.canvas.configure(yscrollcommand=self.y_bar.set)
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-        self.canvas.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-        self.canvas.config(state='disabled')
-        
+        self.msg_list.grid_columnconfigure(0, weight=1)
+        self.msg_list.grid_rowconfigure(0, weight=1)
+
         # Chat label, box and send button
         self.chat_label = Label(self.master, text="Type your message")
         self.chat_label.grid(row=4, columns=3, sticky="nsew")
@@ -63,18 +60,13 @@ class Client:
         self.send_button = Button(self.master, text="Send", width="20", command=self.send)
         self.send_button.grid(row=5, column=4, padx=5, pady=5, sticky="NSEW")
         
-        # Message y coordinate
-        self.message_y = 2
-        
         # Bind F1 to send
-        self.master.bind("<F1>", self.send)
-        
+        self.master.bind("<Return>", self.send)
         
         #Close window and loop
         self.ui_done = True
         self.master.protocol("WM_DELETE_WINDOW", self.close)
         self.master.mainloop()
-        
         
     def send(self, event=None):
         message = f"{self.name}: {self.chat_box.get('1.0', 'end')}"
@@ -96,12 +88,7 @@ class Client:
                     self.sock.send(self.name.encode('utf-8'))
                     
                 elif self.ui_done:
-                    self.canvas.config(state='normal')
-                    add_message = Label(self.canvas, text=message, wraplength=400, justify=LEFT, bg="white")
-                    self.canvas.create_window((5, self.message_y), window=add_message, anchor="nw")
-                    self.message_y += add_message.winfo_height() +10
-                    self.canvas.configure(scrollregion = (0, 0, 0, self.message_y+2))
-                    self.canvas.config(state='disabled')
+                    self.msg_list.insert(END, message)
                     
             except ConnectionAbortedError:
                 break
