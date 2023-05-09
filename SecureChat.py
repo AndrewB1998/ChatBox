@@ -21,11 +21,10 @@ class StartUI:
         self.selectUI(self.root)
         
     def selectUI(self, root):
-        def raise_frame_join(frame):
-            self.join_btn.grid_forget()
-            self.host_btn.grid_forget()
-            self.name_label.grid_forget()
-            self.name_entry.grid_forget()
+        def raise_frame_join():
+            btn_forget = [self.join_btn, self.host_btn, self.name_label, self.name_entry, self.save_name]
+            for btn in btn_forget:
+                btn.grid_forget()
             self.client = Client(HOST, PORT, root, self.name)
         
         def raise_frame_host(frame):
@@ -36,6 +35,12 @@ class StartUI:
             self.join_btn.configure(text="Join chat as "+ self.name), self.host_btn.configure(text="Host a chat as "+ self.name)
             self.join_btn.configure(state=NORMAL), self.host_btn.configure(state=NORMAL)
             
+        # Row and column configuration
+        Grid.rowconfigure(self.master, 3, weight=1)
+
+        for col in range(5):
+            Grid.columnconfigure(self.master, col, weight=1)
+                
         self.join_btn = Button(self.root, text= "Join a chatroom", command=lambda: raise_frame_join(self.root), state=DISABLED)               
         self.host_btn = Button(self.root, text='Host a chatroom', command=lambda: raise_frame_host(self.root), state=DISABLED)
         self.name_label = Label(self.root, text="Username")
