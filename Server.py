@@ -25,12 +25,18 @@ def handle(client):
             print(message.decode('utf-8'))
             send(message)
             
+            if len(names) > 0:
+                send_names = " ".join(names)
+                client.send(f"NAMES {send_names}".encode('utf-8'))
+            
         except:
             idx = clients.index(client)
             clients.remove(client)
             client.close()
             name = names[idx]
             names.remove(name)
+            send(f"{name} has left the chat!".encode('utf-8'))
+           
             break
 
 def receive():
