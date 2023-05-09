@@ -24,25 +24,38 @@ class StartUI:
         def raise_frame_join(frame):
             self.join_btn.grid_forget()
             self.host_btn.grid_forget()
-            self.client = Client(HOST, PORT, root)
+            self.name_label.grid_forget()
+            self.name_entry.grid_forget()
+            self.client = Client(HOST, PORT, root, self.name)
         
         def raise_frame_host(frame):
-            pass    
+            pass   
         
-        self.join_btn = Button(self.root, text='Join a chat', command=lambda:raise_frame_join(self.root))
-        self.join_btn.grid(row=1, column=0, padx=5, pady=5, sticky="NSEW")        
-        self.host_btn = Button(self.root, text='Host a chat', command=lambda:raise_frame_host(self.root))
+        def set_name():
+            self.name = self.name_entry.get()
+            self.join_btn.configure(text="Join chat as "+ self.name), self.host_btn.configure(text="Host a chat as "+ self.name)
+            self.join_btn.configure(state=NORMAL), self.host_btn.configure(state=NORMAL)
+            
+        self.join_btn = Button(self.root, text= "Join a chatroom", command=lambda: raise_frame_join(self.root), state=DISABLED)               
+        self.host_btn = Button(self.root, text='Host a chatroom', command=lambda: raise_frame_host(self.root), state=DISABLED)
+        self.name_label = Label(self.root, text="Username")
+        self.name_entry = Entry(self.root)
+        
         self.host_btn.grid(row=2, column=0, padx=5, pady=5, sticky="NSEW")
-      
+        self.join_btn.grid(row=1, column=0, padx=5, pady=5, sticky="NSEW")
+        self.name_label.grid(row=3, column=0, padx=5, pady=5, sticky="NSEW")
+        self.name_entry.grid(row=4, column=0, padx=5, pady=5, sticky="NSEW")
         
+        self.save_name = Button(self.root, text="Save", command= set_name)
+        self.save_name.grid(row=5, column=0, padx=5, pady=5, sticky="NSEW")
 
 class Client:
-    def __init__(self, host, port, root):
+    def __init__(self, host, port, root, name):
         self.root = root
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host, port))
         
-        self.name = simpledialog.askstring("Name", "What is your name?", parent=root)
+        self.name = name
         ui_thread = threading.Thread(target=self.mainUI)
         receive_thread = threading.Thread(target=self.receive)
         
