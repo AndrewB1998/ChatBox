@@ -1,6 +1,6 @@
 import socket
 import threading    
-
+import subprocess
 hostname = socket.gethostname()
 HOST = socket.gethostbyname(hostname)
 PORT = 1234
@@ -55,7 +55,10 @@ def receive():
         
         thread = threading.Thread(target=handle, args=(client,))
         thread.start()
-
+        
+if __name__ == '__main__':
+    # Start the server using subprocess
+    subprocess.Popen(["python", "server.py"])
 
 print("Server running...")
 receive()
