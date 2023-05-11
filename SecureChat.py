@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import filedialog
 import socket
 import threading
 import subprocess
@@ -77,7 +78,7 @@ class StartUI:
             hosting_lbl.grid(row=3, column=0, padx=40, sticky="NSEW")  
                   
         # Create elements and set them to the grid 
-        self.title_lbl = make_element(Label, self.left_frame, text="ChatBox", bg="lightblue", font="Constantia 20 bold", row=0, column=0, padx=40)
+        self.title_lbl = make_element(Label, self.left_frame, text="ChatBox", bg="lightblue", font="Constantia 25 bold", row=1, column=0, padx=40)
         self.desc_lbl = make_element(Label, self.left_frame, text="Host or join a chat \n Leave IP and Port empty if hosting", bg="lightblue", font="Constantia 10", row=2, column=0, columnspan=1)
 
         self.name_lbl = make_element(Label, self.right_frame, text="Username", bg="SystemButtonFace", font="TkDefaultFont", row=0, column=1, columnspan=1)
@@ -93,7 +94,7 @@ class StartUI:
         self.port_btn = make_element(Button, self.right_frame, text="Save", command=set_port, sticky="EW", state=NORMAL, row=2, column=4, padx=5, columnspan=2)
         self.join_btn = make_element(Button, self.right_frame, text="Join", command=lambda: raise_frame_join(), sticky="NSEW", state=DISABLED, row=3, column=1, padx=0, columnspan=4)
         self.host_btn = make_element(Button, self.right_frame, text="Host", command=lambda: raise_frame_host(), sticky="NSEW", state=DISABLED, row=4, column=1, padx=0, columnspan=4)
-
+        
 
         
 class Client:
@@ -121,23 +122,30 @@ class Client:
         self.root.bind("<Return>", self.send)
         self.ui_done = True
         
+        root.configure(bg="lightblue")
         Grid.columnconfigure(self.root, 0, weight=1)
         Grid.columnconfigure(self.root, 1, weight=1)
+        Grid.rowconfigure(self.root, 0, weight=1)
         Grid.rowconfigure(self.root, 1, weight=1) 
         # Make chat elements
         self.y_bar = Scrollbar(self.root, orient=VERTICAL)
         self.msg_list = make_element(Listbox, self.root, width=15, height=15, yscrollcommand=self.y_bar.set, row=1, column=0, columnspan=5, padx=5, pady=5, sticky="NSEW")
-        self.msg_lbl = make_element(Label, self.root, text="Messages", row=0, column=1, sticky="W")
+        self.msg_lbl = make_element(Label, self.root, text="Messages", bg="lightblue", row=0, column=1, sticky="W")
         self.user_list = make_element(Listbox, self.root, width=15, height=15, row=1, column=4, pady=5, sticky="NSEW")
-        self.users_lbl = make_element(Label, self.root, text="Participants", row=0, column=4, sticky="NSEW")
-        self.chat_lbl = make_element(Label, self.root, text="Type your message", row=4, column=1, sticky="W")
+        self.users_lbl = make_element(Label, self.root, text="Participants", bg="lightblue", row=0, column=4, sticky="NSEW")
+        self.chat_lbl = make_element(Label, self.root, text="Type your message", bg="lightblue", row=4, column=1, sticky="W")
         self.chat_txt = make_element(Text, self.root, height=3, row=5, column=0, columnspan=3, sticky="ew", padx=5, pady=5)
         self.send_btn = make_element(Button, self.root, text="Send", width="20", command=self.send, row=5, column=4, padx=5, pady=5, sticky="NSEW")       
-        
+        self.save_chat_btn = make_element(Button, self.root, text="Save chat", width="20", command=self.save_chat, row=4, column=4, padx=5, pady=5, sticky="NSEW")
         self.y_bar.config(command=self.msg_list.yview)
-        self.y_bar.grid(row=1, column=5, sticky="ns")
+        self.y_bar.grid(row=0, column=5, rowspan=6, sticky="NS")
         
-        
+    def save_chat(self):
+        if file_path := filedialog.asksaveasfilename(defaultextension=".txt"):
+                with open(file_path, "w") as f:
+                    f.write("\n".join(self.messages))
+        chat_save =  f"{self.name} saved chat!"
+        self.msg_list.insert(END, chat_save)   
      
     # Update the users window    
     def update_users(self, names):
@@ -180,15 +188,31 @@ class Client:
                     self.msg_list.insert(END, message)
                     self.msg_list.see(END)
                     
-            except ConnectionAbortedError:
+            except ConnectionAbortedError as e:
+                print("Connection Aborted:", e)
+                self.sock.close()
                 break
-            
-            except:
-                print("Error")
+    
+            except ConnectionResetError as e:
+                print("Connection Reset:", e)
+                self.sock.close()
+                break
+                
+            except socket.error as e:
+                print ("Socket error:", e)
+                self.sock.close()
+                break
+                
+            except Exception as e:
+                print("Error:", e)
                 self.sock.close()
                 break
             
     
 if __name__ == "__main__":
-    StartUI(root)
-    root.mainloop()
+   
+    start = StartUI(root)
+    try:
+        root.mainloop()
+    except Exception as e:
+        print("An error occurred:", e)
