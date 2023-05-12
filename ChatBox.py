@@ -222,7 +222,7 @@ class Client:
                         key = message.split()[1][2:-1]
                         self.fernet = Fernet(key)
                         self.key_received = True
-                        print("Key received:", key)
+                        print("Key received:")
                     if not self.name_received:
                         self.sock.send(self.name.encode('utf-8'))
                         self.name_received = True
