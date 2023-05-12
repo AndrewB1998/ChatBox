@@ -257,9 +257,5 @@ class Client:
             
     
 if __name__ == "__main__":
-    test = Client("192.168.1.8", 1234, root, "test")
-    #start = StartUI(root)
-    try:
-        root.mainloop()
-    except Exception as e:
-        print("An error occurred:", e)
+    StartUI(root)
+    root.mainloop()
