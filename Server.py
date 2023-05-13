@@ -36,26 +36,28 @@ def handle(client):
             clients.remove(client)
             name = names[idx]
             names.remove(name)
-            print(f"Client {name} left")
-            send(f"User left: {name}".encode('utf-8'))
+            send(f"User {name} left!".encode('utf-8'))
             break
-    
-    
 
 def receive():
     while True:
-        client, address = server.accept()
-        print(f"Connected with {str(address)}")
-        client.send(f"KEY {key}".encode('utf-8'))
-        print(key)
-        client.send("NAME".encode('utf-8'))
-        name = client.recv(1024).decode('utf-8')
-        send(f"Welcome to the chat {name}!".encode('utf-8'))
-        names.append(name)
-        clients.append(client)
+        try:
+            client, address = server.accept()
+            print(f"Connected with {str(address)}")
+            client.send(f"KEY {key}".encode('utf-8'))
+            client.send("NAME".encode('utf-8'))
+            name = client.recv(1024).decode('utf-8')
+            send(f"Welcome to the chat {name}!".encode('utf-8'))
+            names.append(name)
+            clients.append(client)
 
-        thread = threading.Thread(target=handle, args=(client,))
-        thread.start()
+            thread = threading.Thread(target=handle, args=(client,))
+            thread.start()
+            
+        except Exception as e:
+            print(f"Error: {e}")
+            server.close()
+            break
         
 if __name__ == '__main__':
     # Start the server using subprocess
