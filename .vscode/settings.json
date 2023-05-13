@@ -6,6 +6,7 @@
         "padx",
         "pady",
         "rowspan",
+        "xscrollcommand",
         "yscrollcommand"
     ]
 }

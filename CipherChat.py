@@ -13,15 +13,14 @@ PORT = 1234
 # Create the Tk instance
 root = Tk()
 root.title("Chatter")
-root.geometry("400x300")
+root.geometry("600x300")
 root.minsize(600, 400)
-def make_element(element,frame, text=None, bg=None, font=None, row=None, column=None, state=None, padx=None, pady=None, sticky=None, columnspan=None, rows=None, command=None, height=None, width=None, yscrollcommand=None):
-        elem = element(frame, text=text, bg=bg, font=font, command=command, state=state, height=height, width=width, yscrollcommand=yscrollcommand)
+
+def make_element(element,frame, text=None, bg=None, font=None, row=None, column=None, state=None, padx=None, pady=None, sticky=None, columnspan=None, rows=None, command=None, height=None, width=None, xscrollcommand=None, yscrollcommand=None):
+        elem = element(frame, text=text, bg=bg, font=font, command=command, state=state, height=height, width=width, xscrollcommand=xscrollcommand, yscrollcommand=yscrollcommand)
         elem.grid(row=row, column=column, padx=padx, pady=pady, sticky=sticky, columnspan=columnspan, rows=rows)
         return elem
 
-def make_button(frame, text, command, state):
-        return Button(frame, text=text, command=command, state=state)
 class StartUI:
     def __init__(self, root):
         self.root = root
@@ -82,6 +81,7 @@ class StartUI:
             except:
                 self.hosting_lbl.configure(text="Server failed to start")
                 
+        # Close the server subprocess and proceed to exit window       
         def close_server():
             subprocess.Popen(['python', 'Server.py']).terminate()
             for widget in root.winfo_children():
@@ -133,64 +133,77 @@ class Client:
         self.messages = []
         self.enc_messages = []
         self.root.bind("<Return>", self.send)
-        
         root.configure(bg="lightblue")
         
-        # Reset previous row and column configurations and set
+        # Reset previous row and column configurations and set them
         for i in range(5):
             self.root.rowconfigure(i, weight=0)
             self.root.columnconfigure(i, weight=0)
-        self.root.columnconfigure(0, weight=1)
+        self.root.columnconfigure(0, weight=5)
+        self.root.columnconfigure(4, weight=1)
         self.root.rowconfigure(1, weight=1)
        
         # Make chat elements
-        self.y_bar = Scrollbar(self.root, orient=VERTICAL)
-        self.msg_list = make_element(Listbox, self.root, width=15, height=15, yscrollcommand=self.y_bar.set, row=1, column=0, columnspan=5, padx=5, pady=5, sticky="NSEW")
+        self.y_bar = Scrollbar(self.root,  orient=VERTICAL)
+        self.y_bar_users = Scrollbar(self.root, orient=VERTICAL)
+        self.x_bar = Scrollbar(self.root, orient=HORIZONTAL)
+        self.x_bar_users = Scrollbar(self.root, orient=HORIZONTAL)
+        
+        self.msg_list = make_element(Listbox, self.root, width=15, height=15, xscrollcommand=self.x_bar.set, yscrollcommand=self.y_bar.set, row=1, column=0, columnspan=2, padx=3, pady=5, sticky="NSEW")
+        self.user_list = make_element(Listbox, self.root, width=15, height=15, xscrollcommand=self.x_bar_users.set, yscrollcommand=self.y_bar_users.set, row=1, column=4, padx=3, pady=5, sticky="NSEW")
+        
         self.msg_lbl = make_element(Label, self.root, text="Messages", bg="lightblue", row=0, column=0, sticky="NS")
-        self.user_list = make_element(Listbox, self.root, width=15, height=15, row=1, column=4, padx=10, pady=5, sticky="NSEW")
         self.users_lbl = make_element(Label, self.root, text="Participants", bg="lightblue", row=0, column=4, sticky="NSEW")
         self.chat_lbl = make_element(Label, self.root, text="Type your message", bg="lightblue", row=4, column=0, sticky="NS")
+        
         self.chat_txt = make_element(Text, self.root, height=3, row=5, column=0, columnspan=3, sticky="ew", padx=5, pady=5)
+        
         self.send_btn = make_element(Button, self.root, text="Send", width="20", bg="lightblue", command=self.send, row=5, column=4, padx=5, pady=5, sticky="NSEW")       
         self.enc_btn = make_element(Button, self.root, text="Encrypt", bg="lightblue", width="20", command=self.encrypt, row=4, column=1, padx=5, pady=5, sticky="NSEW")
-        self.save_chat_btn = make_element(Button, self.root, text="Save chat", bg="lightblue", width="20", command=self.save_chat, row=4, column=4, padx=5, pady=5, sticky="E")
-        self.y_bar.config(command=self.msg_list.yview)
-        self.y_bar.grid(row=0, column=5, rowspan=6, sticky="NS")
+        self.save_chat_btn = make_element(Button, self.root, text="Save chat", bg="lightblue", width="20", command=self.save_chat, row=4, column=4, padx=5, pady=5, sticky="NSEW")
         
+        self.x_bar.config(command=self.msg_list.xview)
+        self.x_bar_users.config(command=self.user_list.xview)
+        self.y_bar.config(command=self.msg_list.yview)
+        self.y_bar_users.config(command=self.user_list.yview)
+        
+        self.x_bar.grid(row=2, column=0, columnspan=2, padx=5, sticky="EW")
+        self.x_bar_users.grid(row=2, column=4, columnspan=1, padx=5, sticky="EW")
+        self.y_bar.grid(row=1, column=3, rowspan=1, pady=5, padx=3, sticky="NS")
+        self.y_bar_users.grid(row=1, column=5, rowspan=1, pady=5, padx=3, sticky="NS")
+    
+    # Change msg_list to show encrypted messages and disable the chat
     def encrypt(self):
         self.msg_list.delete(0, END)
         self.user_list.delete(0, END)
         for message in self.enc_messages:
             self.msg_list.insert(END, message)
-        
         self.enc_mode = True
+        self.msg_list.config(state = DISABLED)
         self.enc_btn.config(text="Decrypt", command=self.decrypt)
         self.send_btn.config(text= "Decrypt to chat",state=DISABLED)
-        
+    
+    # Change msg_list to show decrypted messages and enable the chat    
     def decrypt(self):
+        self.msg_list.config(state = NORMAL)
         self.msg_list.delete(0, END)
         self.user_list.delete(0, END)
         for message in self.messages:
-            self.msg_list.insert(END, message)
-        
-        for user in self.users:
-            if user not in self.users:
-                self.user_list.insert(END, user)
-            
+            self.msg_list.insert(END, message)      
         self.enc_mode = False
         self.enc_btn.config(text="Encrypt", command=self.encrypt)
         self.send_btn.config(text="Send", state=NORMAL)
-        
+        self.sock.send(self.fernet.encrypt(f"{self.name} has returned to the chat!".encode('utf-8')))
+    
+    #Save the chat to a file    
     def save_chat(self):
         for i in range(self.msg_list.size()):
             self.messages.append(self.msg_list.get(i))
         if file_path := filedialog.asksaveasfilename(defaultextension=".txt"):
                 with open(file_path, "w") as f:
                     f.write("\n".join(self.messages))
-        chat_save =  f"{self.name} saved chat!"
-        print(self.msg_list)
-        self.msg_list.insert(END, chat_save)   
-     
+        self.sock.send(self.fernet.encrypt(f"{self.name} saved chat!" .encode('utf-8')))
+        
     # Update the users window    
     def update_users(self, name):
         self.user_list.delete(0, END)
@@ -201,17 +214,18 @@ class Client:
     # Send message to server and delete the text box    
     def send(self, event=None):
         message = f"{self.name}: {self.chat_txt.get('1.0', 'end')}"
-        enc_message = self.fernet.encrypt(message.encode('utf-8')) 
-        self.sock.send(enc_message)
+        self.sock.send(self.fernet.encrypt(message.encode('utf-8')))
         self.chat_txt.delete('1.0', 'end') 
-         
+        
+    # Close the socket and exit the program     
     def close(self):
         self.running = False
         print(f"Client {self.name} left")
         self.sock.close()
         self.root.destroy()
         exit(0)
-            
+    
+    # Receive messages from server and handle them accordingly        
     def receive(self):
         while self.running:
             try:
@@ -222,13 +236,11 @@ class Client:
                         key = message.split()[1][2:-1]
                         self.fernet = Fernet(key)
                         self.key_received = True
-                        print("Key received:", key)
+                        print("Key received:")
                     if not self.name_received:
                         self.sock.send(self.name.encode('utf-8'))
                         self.name_received = True
                     dec_message = self.fernet.decrypt(message).decode()
-                    print(f"Client sent message {message}")
-                    print(dec_message)
                     self.enc_messages.append(message)
                     self.messages.append(dec_message)
                     self.msg_list.insert(END, dec_message)
@@ -244,11 +256,6 @@ class Client:
                     elif message.startswith("User"):
                         self.msg_list.insert(END, message)
                         self.msg_list.see(END)
-                    
-            except (socket.error, ConnectionAbortedError, ConnectionResetError) as e:
-                            print(f"An error occurred: {e}")
-                            self.close()
-                            break
                         
             except Exception as e:
                 print(f"An error occurred: {e}")
@@ -257,9 +264,5 @@ class Client:
             
     
 if __name__ == "__main__":
-    test = Client("192.168.1.8", 1234, root, "test")
-    #start = StartUI(root)
-    try:
-        root.mainloop()
-    except Exception as e:
-        print("An error occurred:", e)
+    start=StartUI(root)
+    root.mainloop()
