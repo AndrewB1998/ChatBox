@@ -222,7 +222,7 @@ class Client:
                         key = message.split()[1][2:-1]
                         self.fernet = Fernet(key)
                         self.key_received = True
-                        print("Key received:")
+                        print("Key received:", key)
                     if not self.name_received:
                         self.sock.send(self.name.encode('utf-8'))
                         self.name_received = True
@@ -257,5 +257,9 @@ class Client:
             
     
 if __name__ == "__main__":
-    StartUI(root)
-    root.mainloop()
+    test = Client("192.168.1.8", 1234, root, "test")
+    #start = StartUI(root)
+    try:
+        root.mainloop()
+    except Exception as e:
+        print("An error occurred:", e)
