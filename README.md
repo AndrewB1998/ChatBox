@@ -1,4 +1,4 @@
-# Cipherchat (Programming course TKO_3123)
+# CipherChat (Programming course TKO_3123)
 Cipherchat is a chat application that uses Fernet's symmetric encryption for protection 
 and utilizes Python's tkinter GUI toolkit, sockets and threading.
 
