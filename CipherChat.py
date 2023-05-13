@@ -12,8 +12,8 @@ PORT = 1234
 
 # Create the Tk instance
 root = Tk()
-root.title("Chatter")
-root.geometry("600x300")
+root.title("CipherChat")
+root.geometry("600x400")
 root.minsize(600, 400)
 
 def make_element(element,frame, text=None, bg=None, font=None, row=None, column=None, state=None, padx=None, pady=None, sticky=None, columnspan=None, rows=None, command=None, height=None, width=None, xscrollcommand=None, yscrollcommand=None):
@@ -91,7 +91,7 @@ class StartUI:
             self.exit_btn = make_element(Button, self.root, text="Exit", font="Constantia 10", bg="lightblue", command=lambda: root.destroy(), row=1, column=0, columnspan=5, rows=2, padx=40, pady=40, sticky="NSEW")
         
         # Create elements and set them to the grid 
-        self.title_lbl = make_element(Label, self.left_frame, text="ChatBox", bg="lightblue", font="Constantia 25 bold", row=1, column=0, padx=40)
+        self.title_lbl = make_element(Label, self.left_frame, text="CipherChat", bg="lightblue", font="Constantia 25 bold", row=1, column=0, padx=40)
         self.desc_lbl = make_element(Label, self.left_frame, text="Host or join a chat \n Leave IP and Port empty if hosting", bg="lightblue", font="Constantia 10", row=2, column=0, columnspan=1)
 
         self.name_lbl = make_element(Label, self.right_frame, text="Username", bg="SystemButtonFace", font="TkDefaultFont", row=0, column=1, columnspan=1)
