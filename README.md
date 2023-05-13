@@ -1,5 +1,6 @@
-# ChatBox (Programming course TKO_3123)
-- Chatbox is a chat application built with Python's tkinter GUI toolkit and sockets.
+# Cipherchat (Programming course TKO_3123)
+Cipherchat is a chat application that uses Fernet's symmetric encryption for protection 
+and utilizes Python's tkinter GUI toolkit, sockets and threading.
 
 # Requirements
 - Python 3.0 or above
@@ -15,3 +16,4 @@
 - Click the "Join" button to connect to an existing server, or click the "Host" button to start a new server and wait for other clients to connect.
 - Once connected, you can start chatting with other clients on the server.
 - To save the chat, click save and choose a directory of your choice
+- You can use the "Encrypt" button to transfrom the already received messages to ciphertext
