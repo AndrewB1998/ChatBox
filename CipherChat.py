@@ -74,7 +74,6 @@ class StartUI:
             subprocess.Popen(['python', 'Server.py'])
             self.hosting_lbl = Label(self.left_frame, text=f"Server running at {self.HOST}, {self.PORT}", bg="lightblue", font="Constantia 10")
             try:
-                self.sock.connect((self.HOST, self.PORT))
                 self.hosting_lbl.grid(row=3, column=0, padx=40, sticky="NSEW")  
                 self.join_btn.configure(text= "Open a new instance to join", state=DISABLED)
                 self.host_btn.configure(text= "Close server", command=close_server)
@@ -84,6 +83,7 @@ class StartUI:
         # Close the server subprocess and proceed to exit window       
         def close_server():
             subprocess.Popen(['python', 'Server.py']).terminate()
+            self.sock.close()
             for widget in root.winfo_children():
                 widget.destroy()
             self.root.configure(bg='light blue')
@@ -112,19 +112,24 @@ class Client:
         self.host = host
         self.port = port
         self.root = root
-        
+        self.name = name
+        self.running = True
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.fernet = None
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((host, port))
-        self.name = name
+        try:
+            self.sock.connect((host, port))
+        except Exception as e:
+            print(f"FAILURE{e}")
+            self.close()
+        
         self.enc_mode = False
         ui_thread = threading.Thread(target=self.mainUI)
         receive_thread = threading.Thread(target=self.receive)
         self.key_received = False
         self.name_received = False
         
-        self.running = True
+        
         ui_thread.start()
         receive_thread.start()
 
