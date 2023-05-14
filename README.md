@@ -10,7 +10,7 @@ and utilizes Python's tkinter GUI toolkit, sockets and threading. Host a chat us
 - Clone this repository or download the ZIP file and extract its contents to a directory.
 - Open a terminal and navigate to the directory where the files are located.
 - Install cryptography with terminal command *pip install cryptography*
-- Run the following command to start the application: python CipherChat.py
+- Run the following command to start the application: *python CipherChat.py*
 
 # Usage
 - In the start window, enter a username, the IP-address and port of an existing server to join, or your local IP-address to host.
