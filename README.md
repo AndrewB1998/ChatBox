@@ -23,5 +23,5 @@ and utilizes Python's tkinter GUI toolkit, sockets and threading.
 # Troubleshoot
 - Make sure that the required installations are done in the project directory
 - If python is installed, but pip commands don't work, run terminal command *py -m ensurepip --upgrade* or *py get-pip.py*
-- Tkinter comes along with Python but incase there is issues, use terminal command *pip install tk
+- Tkinter comes along with Python but incase there is issues, use terminal command *pip install tk*
 - The client closes if a connection can't be made. Make sure that VPN is off when connecting and that there is a server running when joining
