@@ -1,6 +1,6 @@
-# CipherChat (Programming course TKO_3123)
+# CipherChat
 Cipherchat is a chat application that uses Fernet's symmetric-key algorithm for protection 
-and utilizes Python's tkinter GUI toolkit, sockets and threading. Host a chat using your local IP-address or join an existing server
+and utilizes Python's tkinter GUI toolkit, sockets and threading. Host a chat using your local IP-address or join an existing server. 
 
 # Overview
 ![cipherchat chat interface](https://github.com/AndrewB1998/CipherChat/assets/71883814/e0f6d937-5ae3-4268-92e6-22d973d1b9a7)
