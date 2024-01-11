@@ -12,7 +12,6 @@ Chat interface. The “encrypt” button activates encrypted mode (displays mess
 # Requirements
 - Python 3.0 or above (you can check the version with terminal command *python --version* and if necessary, install python from https://www.python.org/downloads/)
 - Cryptography library
-![Uploading cipherchat chat interface.png…]()
 
 # Installation
 - Clone this repository or download the ZIP file and extract its contents to a directory.
@@ -32,4 +31,3 @@ Chat interface. The “encrypt” button activates encrypted mode (displays mess
 - Make sure that the required installations are done in the project directory
 - If python is installed, but pip commands don't work, run terminal command *py -m ensurepip --upgrade* or *py get-pip.py*
 - Tkinter comes along with Python but incase there is issues, use terminal command *pip install tk*
-- The client closes if a connection can't be made. Make sure that VPN is off when connecting and that there is a server running when joining
